@@ -58,12 +58,41 @@ That is everything. The installer builds a fully isolated environment **inside t
 
 ### The easy way: the launcher menu
 
-Run `run_unimate.ps1` (right-click → Run with PowerShell). It offers a numbered menu:
+Run `run_unimate.ps1` (right-click → Run with PowerShell). You get a numbered menu in three groups. In almost every item, pressing **Enter** accepts a sensible default.
 
-- **1 — Sample motion on your asset.** It asks for three things: which model to animate (press Enter for the built-in eagle example), what it should do (the sentence), and where to save. Results appear in `outputs\`.
-- **2 — Batch of scenes** from a prepared JSON list (see `assets\examples\examples.json`).
-- **4 — Download the model** (needed once; ~1.1 GB).
-- **7 — Built-in Python shell** for advanced use.
+---
+
+**1 — Generate motion** (your asset + a text prompt). The main item. It asks for: the asset (Enter = built-in eagle `assets/examples/eagle`; this also accepts a rig prepared by item 6, e.g. `outputs/rig/my_hero`), an English prompt, the number of variants, and prompt adherence.
+> Example fill-in: asset `assets/examples/shark`, prompt `An object swims and turns around.`, variants `3`, adherence `3`.
+> Result: previews in `outputs\samples_custom\animations\*.mp4`, motions in `motions\*.npy`. Afterwards it asks "Animate the mesh now? (y/N)" — answer `y` to put the motions on the model right away and save GLB + FBX.
+
+**2 — Batch generation** (several scenes from a JSON list). Takes a scene list of "asset + prompt" from a file. A ready example ships as `assets\examples\examples.json` (Garfield dancing, a Gundam kicking, Baymax walking…).
+> Example fill-in: path `assets\examples\examples.json`, everything else — Enter.
+> Your own file is a JSON list like `[{"asset": "outputs/rig/my_hero", "id": "hero-walk", "prompt": "An object walks forward."}]`.
+
+**3 — Motion editing.** Keeps the chosen joints at their current motion and regenerates everything else under a new prompt. Needs a JSON naming **real clips** (clips come from dataset assets, or from a rig prepared with saved clips) and a joint list.
+> Example fill-in: `cases.json` containing `{"mixamo-Cocky_Head_Turn-000": "An object walks forward."}`, joints `Neck,Head`.
+> Result: `outputs\samples_edit\motion_edit\` — each result sits next to its source clip for comparison.
+
+**4 — In-betweening.** Keeps chosen keyframes and fills the motion between them. Frame indices are given; negative indices count from the end.
+> Example fill-in: `cases.json` like `{"mixamo-Air_Squat-000": "An object squats and then stands up."}`, frames `0,-1` (first and last pose — everything between is generated).
+> Result: `outputs\samples_inbetween\inbetween\`.
+
+**5 — Motion expansion** (one long chained take). Several prompts become one continuous motion: the first segment is generated freely, every next one starts from the previous tail.
+> Example fill-in: `cases.json` like `{"mixamo-sequence": ["An object stands up.", "An object walks forward.", "An object turns around in place."]}`, overlap `10` frames.
+> Result: `outputs\samples_expand\motion_expand\`.
+
+**6 — Prepare own rig.** Turns your GLB/glTF/FBX (any of them, animations optional) into a UniMate asset, once: it reads the skeleton, names the joints automatically and builds `cond.npy` plus the canonical mesh.
+> Example fill-in: input `C:\models\my_hero.glb`, output — Enter (it fills `outputs/rig/my_hero` itself).
+> Afterwards use `outputs/rig/my_hero` as the asset in items 1–5. To control the joint labels yourself, run without `--no_review` from the command line (see `data_process/rig_preprocess/README.md`).
+
+**7 — Animate samples** (motions → GLB + FBX). Takes a generation output directory and drives every motion through its asset's mesh via Blender: animated GLB and FBX come out, ready for Blender / Unity / Unreal / Godot.
+> Example fill-in: `outputs\samples_custom`.
+> Result: `outputs\samples_custom\animated\<name>.glb` and `.fbx`. Incompatible motions are skipped with a message.
+
+**8 — Download checkpoint.** Once, fetches the inference set (~1.1 GB): config, normalization statistics, latest checkpoint. Resumable — a dropped connection does not start over.
+
+**9 — Train** and **10 — Precompute text embeddings** are for researchers (they need the UniML3D dataset; not required for inference). **11 — Python shell** is the portable environment's interactive shell for manual work.
 
 Before the menu, the launcher automatically picks the GPU with the most free memory and isolates all caches into the project folder — nothing leaks into `C:\Users\...`.
 
@@ -71,21 +100,11 @@ Before the menu, the launcher automatically picks the GPU with the most free mem
 
 ```
 run_unimate.ps1
-  → 4  (download the model, once)
-  → 1  (asset: assets/examples/eagle, prompt: An object flaps its wings.)
+  → 8  (download the model, once)
+  → 1  (asset: Enter — the eagle, prompt: An object flaps its wings., variants 3)
+  → answer "y" to "Animate the mesh now?"
+  → open outputs\samples_custom\animations\*.mp4 and outputs\samples_custom\animated\*.glb
 ```
-
-Open `outputs\samples_custom\animations\*.mp4` — if the motion fits your needs, one more command puts it on the mesh as GLB + FBX (menu 6, or the animate line below).
-
-### Using your own model
-
-Export your rigged character to GLB (Blender, Unity, Maya all export it), then run it through the rig preparer once:
-
-```
-python -m mcp_unimate rig C:\models\my_hero.glb outputs/rig/my_hero
-```
-
-It reads the bone structure, names the joints automatically and builds the asset. After that, point the sampler at `outputs/rig/my_hero` exactly like the examples.
 
 ### Writing prompts that work
 
@@ -97,7 +116,7 @@ Start with **"An object"** and describe **one motion**:
 | An object flaps its wings. | A golden eagle soars in the sunset. |
 | An object attacks forward. | Fight me! |
 
-Generate 3–5 variants (`--num_repetitions 5`) and pick the best take. If the model ignores your prompt, raise `--cfg` to 5–7; if motions look twitchy, lower it to 2.
+Generate 3–5 variants and pick the best take. If the model ignores your prompt, raise adherence to 5–7; if motions look twitchy, lower it to 2.
 
 ## 🤖 For AI agents and power users: FastMCP + CLI
 
