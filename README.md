@@ -7,6 +7,12 @@
   <a href="https://huggingface.co/Linzhan/UniMate"><img alt="Hugging Face Checkpoints" src="https://img.shields.io/badge/Checkpoints-FF9D00?style=for-the-badge&logo=huggingface&logoColor=000000"></a>
 </p>
 
+<p align="center">
+  <b>Windows portable build & Linux→Windows adaptation:</b>
+  <a href="https://github.com/Methelina">Methelina</a> aka <b>Soror L.'.L.'.</b>
+  · English documentation · Русская версия: <a href="README.ru.md">README.ru.md</a>
+</p>
+
 <div align="center">
     <img src="assets/teaser.png" alt="UniMate teaser" width="100%">
 </div>
@@ -162,6 +168,8 @@ If you find UniMate useful in your research, please consider citing our work:
 ## ⚖️ License
 
 The code in this repository is released under the [MIT License](LICENSE). The released checkpoints are under [CC BY-NC 4.0](https://huggingface.co/Linzhan/UniMate/blob/main/LICENSE); see the [model card](https://huggingface.co/Linzhan/UniMate) for details.
+
+The Windows portable build, the launcher/installer tooling, the FastMCP bridge and the Linux→Windows adaptation of this fork are by **Methelina aka Soror L.'.L.'.'**.
 
 The datasets remain governed by the licenses of their original sources: the [Mixamo](https://www.mixamo.com/) assets by Adobe's Mixamo terms of use, the [Objaverse-XL](https://objaverse.allenai.org/) assets by the license attached to each original object, and the Truebones ZOO motions by [Truebones](https://truebones.com)' commercial license. Please review and comply with the respective source licenses before using the data.
 

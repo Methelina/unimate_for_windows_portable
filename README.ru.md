@@ -4,6 +4,11 @@
 
 <p align="center">Русская версия документации. English: <a href="README.md">README.md</a></p>
 
+<p align="center">
+  <b>Портативная сборка для Windows и адаптация с Linux:</b>
+  <a href="https://github.com/Methelina">Methelina</a> aka <b>Soror L.'.L.'.</b>
+</p>
+
 <div align="center">
     <img src="assets/teaser.png" alt="UniMate teaser" width="100%">
 </div>
@@ -159,6 +164,8 @@ UniMate — **ранний шаг** к text-to-animation для произвол
 ## ⚖️ Лицензия
 
 Код репозитория — [MIT License](LICENSE). Релизные чекпоинты — [CC BY-NC 4.0](https://huggingface.co/Linzhan/UniMate/blob/main/LICENSE) (только некоммерческое использование); детали — в карточке модели.
+
+Портативная сборка для Windows, инструменты установки и запуска, FastMCP-мост и адаптация с Linux выполнены **Methelina aka Soror L.'.L.'.'**.
 
 Датасеты подчиняются лицензиям исходных источников: ассеты [Mixamo](https://www.mixamo.com/) — условия Adobe Mixamo, объекты [Objaverse-XL](https://objaverse.allenai.org/) — лицензия каждого исходного объекта, движения Truebones ZOO — коммерческая лицензия [Truebones](https://truebones.com). Перед использованием данных проверьте и соблюдайте соответствующие лицензии.
 
