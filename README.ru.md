@@ -71,16 +71,9 @@ python -m unimate.inference.sample --exp_dir outputs/unimate_uniml3d_f60_v3 `
 
 Проверено на этой сборке: сэмплинг по встроенным ассетам (орёл — «An object flaps its wings.», акула — «An object swims and turns around.»), CUDA на torch 2.5.1+cu124, bpy 4.0.0 импортируется, оба smoke-теста entry points зелёные.
 
-## 🛠️ Среда (оригинальный способ, Linux/conda)
+## 🛠️ Среда
 
-Все компоненты используют одно conda-окружение из [`requirements.txt`](requirements.txt):
-
-```bash
-conda create -n unimate python=3.10 -y
-conda activate unimate
-pip install "setuptools<81"
-pip install -r requirements.txt --no-build-isolation
-```
+Всё ставит `install_unimate.ps1` в изолированный uv-venv (`unimate_env`, Python 3.10) — без conda и системного Python: установщик скачивает `uv`, ставит uv-managed Python, пиннит `setuptools<81` (требуется для сборки git-пакета `Motion`), устанавливает PyTorch 2.5.1+cu124 и bpy 4.0.0 со своих wheel-индексов и применяет [`requirements.txt`](requirements.txt) с `--no-build-isolation`. Повторный запуск установщика безопасен: валидная существующая среда сохраняется.
 
 ## 📦 Данные и тренировка (вне рамок форка)
 

@@ -5,16 +5,11 @@
 # "unimate_env"); torch 2.5.1+cu124 and bpy 4.0.0 are installed separately
 # from their indexes before this file (PyPI hosts no cp310 bpy wheels).
 #
-#   conda create -n unimate python=3.10 -y
-#   conda activate unimate
-#   pip install "setuptools<81"
-#   pip install -r requirements.txt --no-build-isolation
-#
 # The Motion git dependency has a legacy setup.py that imports pkg_resources,
 # which setuptools >= 81 no longer ships. Isolated builds always use the
 # newest setuptools, so the install must run with --no-build-isolation
-# against an env setuptools < 81 — installed by the step above (fresh conda
-# envs ship setuptools >= 81 too); the pin below keeps it from upgrading.
+# against an env setuptools < 81 - installed by the step above (a fresh uv
+# venv ships setuptools >= 81 too); the pin below keeps it from upgrading.
 #
 # Only direct dependencies are listed; everything else (CUDA runtime libs,
 # tokenizers, HTTP stack, ...) is resolved transitively by pip. Versions are

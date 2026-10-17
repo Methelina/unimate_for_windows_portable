@@ -47,14 +47,7 @@
 > - Windows port of the rendering stack: the GPU render lock works via fcntl/msvcrt dispatch (`data_process/utils/blender_render.py`). All POSIX shell wrappers (`scripts/*.sh`, `data_process/scripts/*.sh`) have been **removed** in this build — every pipeline stage keeps its `python -m ...` module entry point, exposed through the launcher menu and the MCP/CLI tools below.
 > - See `WINDOWS_PORT_AUDIT.md` for the per-file portability audit.
 
-All components share a single conda environment, specified in [`requirements.txt`](requirements.txt):
-
-```bash
-conda create -n unimate python=3.10 -y
-conda activate unimate
-pip install "setuptools<81"
-pip install -r requirements.txt --no-build-isolation
-```
+Everything is installed by `install_unimate.ps1` into an isolated uv venv (`unimate_env`, Python 3.10) — no conda, no system Python: it downloads `uv`, installs a uv-managed Python, pins `setuptools<81` (required by the `Motion` git dependency's legacy build), installs PyTorch 2.5.1+cu124 and bpy 4.0.0 from their wheel indexes, and applies [`requirements.txt`](requirements.txt) with `--no-build-isolation`. Rerunning the installer is safe: a valid existing environment is kept.
 
 ## 📊 Data & Training (out of scope for this fork)
 

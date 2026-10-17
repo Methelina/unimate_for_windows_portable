@@ -64,7 +64,7 @@ Stages 1 and 2a both read the raw assets and are independent. Stage 3 needs stag
 
 ## Setup
 
-The pipeline uses the repository's `unimate` conda environment ([setup](../README.md#%EF%B8%8F-environment-setup)), plus:
+The pipeline runs inside the portable `unimate_env` created by [`install_unimate.ps1`](../README.md#%EF%B8%8F-environment-setup) (or any environment satisfying [`requirements.txt`](../requirements.txt)), plus:
 
 | Requirement | Used by |
 |---|---|
@@ -477,7 +477,7 @@ The motion features store per-frame differences, so the frame rate is part of th
 
 ## Conventions
 
-- **Wrappers** activate the `unimate` environment (`CONDA_ENV` overrides) and document their variables in their header (`-h`).
+- **Environment** — one shared portable venv (`unimate_env`); no per-stage activation needed. Run every command from the repository root.
 - **Resumable.** Batch stages skip finished outputs and log failures for the next run.
 - **Parallelism.** Blender stages: `--multi-worker N`. Local captioning: `--multi-gpu`. API backends and stage 4: `NUM_WORKERS`.
 - **Naming.** Stage 1 clips are `<object_type>-<action>`, stage 4 clips `<object_type>-<motion>-<clip_idx>`; object types contain no `-`. Mixamo clips have no prefix (one shared skeleton).
