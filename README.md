@@ -169,7 +169,7 @@ If you find UniMate useful in your research, please consider citing our work:
 
 The code in this repository is released under the [MIT License](LICENSE). The released checkpoints are under [CC BY-NC 4.0](https://huggingface.co/Linzhan/UniMate/blob/main/LICENSE); see the [model card](https://huggingface.co/Linzhan/UniMate) for details.
 
-The Windows portable build, the launcher/installer tooling, the FastMCP bridge and the Linux→Windows adaptation of this fork are by **Methelina aka Soror L.'.L.'.'**.
+The Windows portable build, the launcher/installer tooling, the FastMCP bridge and the Linux→Windows adaptation of this fork are by **Methelina aka Soror L.'.L.'.**
 
 The datasets remain governed by the licenses of their original sources: the [Mixamo](https://www.mixamo.com/) assets by Adobe's Mixamo terms of use, the [Objaverse-XL](https://objaverse.allenai.org/) assets by the license attached to each original object, and the Truebones ZOO motions by [Truebones](https://truebones.com)' commercial license. Please review and comply with the respective source licenses before using the data.
 
