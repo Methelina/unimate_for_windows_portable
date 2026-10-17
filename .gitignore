@@ -1,0 +1,29 @@
+# Portable build artifacts
+.cache/
+unimate_env/
+.pixi_home/
+.pixi_envs/
+Bin/
+
+# Downloaded tools
+uv.exe
+uvx.exe
+uv.zip
+uv_tmp/
+
+# Runtime outputs and scratch
+outputs/
+extractur/
+*.part
+*.lock
+install_log.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# OS
+Thumbs.db
+Desktop.ini

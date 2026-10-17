@@ -1,0 +1,36 @@
+# ==========================================
+# UniMate Portable - Settings
+# Version: 1.0.0
+# Author:  Soror L.'.L.'.
+# Updated: 2026-10-17
+#
+# Patchnote v1.0.0 (By Soror L.'.L.'.):
+#   [+] Initial release
+# ==========================================
+
+installer_version: "1.0.0"
+note: "UniMate portable build with fully isolated uv environment"
+
+# Environment
+env_name: "unimate_env"
+python_version: "3.10"
+
+# Repo layout (UniMate source sits in .\UniMate when installed standalone;
+# when these scripts live inside the repo root, "." is used)
+unimate_dir: "."
+
+# PyTorch build: cu124 per requirements.txt
+torch_version: "2.5.1+cu124"
+torchvision_version: "0.20.1+cu124"
+torch_index: "https://download.pytorch.org/whl/cu124"
+# bpy cp310 wheel lives on the Blender index (PyPI dropped it)
+bpy_index: "https://download.blender.org/pypi/"
+
+# Versions
+uv_version: "0.11.6"
+
+# Runtime defaults
+default_checkpoint: "outputs/unimate_uniml3d_f60_v3"
+default_cfg_scale: "3"
+default_replicate: "3"
+default_device: "0"
