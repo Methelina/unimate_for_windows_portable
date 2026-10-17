@@ -134,14 +134,22 @@ def list_checkpoints() -> str:
 @mcp.tool()
 def sample_animation(
     asset: str,
-    prompts: List[str],
+    prompts: Optional[List[str]] = None,
     num_repetitions: int = 1,
     cfg_scale: Optional[float] = None,
     seed: Optional[int] = None,
     exp_dir: str = DEFAULT_EXP,
     output_dir: Optional[str] = None,
+    test_cases_json: Optional[str] = None,
+    motion_edit: bool = False,
+    keep_joints: str = "Neck,Head",
+    inbetween: bool = False,
+    keep_frames: str = "0,-1",
+    motion_expand: bool = False,
+    expand_overlap: int = 10,
 ) -> str:
-    """Generate skeletal motion for an asset from text prompt(s).
+    """Generate skeletal motion for an asset from text prompt(s), or run one
+    of the advanced modes against a test-cases JSON.
 
     asset: an assets/examples name (see list_examples), a rig_preprocess
         output directory, a path to a rig directory with cond.npy, or a
@@ -149,20 +157,48 @@ def sample_animation(
     prompts: one or more captions in the training style, e.g.
         'An object flaps its wings.' - start with 'An object', describe one
         motion, not the character.
+    test_cases_json: JSON naming clips/scenes (batch generation); REQUIRED
+        for the three modes below (their keys must name real clips, e.g.
+        {"mixamo-Air_Squat-000": "An object squats and then stands up."}).
+    motion_edit + keep_joints: hold those joints at their recorded motion,
+        re-animate the rest under the new prompt.
+    inbetween + keep_frames: hold signed frame indices (e.g. "0,-1" = first
+        and last pose) and generate everything between them.
+    motion_expand + expand_overlap: chain the per-case prompt LISTS into one
+        long motion, segments sharing expand_overlap frames.
     cfg_scale: prompt adherence (default 3 from the run config; raise to
         5-7 if the prompt is ignored).
+    Exactly one of motion_edit / inbetween / motion_expand may be set.
     Returns JSON: output_dir, manifest path and generated file lists.
     """
+    modes = [m for m in (motion_edit, inbetween, motion_expand) if m]
+    if len(modes) > 1:
+        return json.dumps({"error":
+            "motion_edit, inbetween and motion_expand are mutually exclusive"})
+    if modes and not test_cases_json:
+        return json.dumps({"error":
+            "motion_edit / inbetween / motion_expand require test_cases_json"})
     out = output_dir or f"outputs/samples_mcp_{Path(asset).name}"
     args = [
         "-m", "unimate.inference.sample",
         "--exp_dir", exp_dir,
-        "--asset", asset,
         "--output_dir", out,
         "--num_repetitions", str(max(1, int(num_repetitions))),
     ]
-    for p in prompts:
-        args += ["--prompt", p]
+    if test_cases_json:
+        args += ["--test_cases_json", test_cases_json]
+    else:
+        if not prompts:
+            return json.dumps({"error": "provide prompts or test_cases_json"})
+        args += ["--asset", asset]
+        for p in prompts:
+            args += ["--prompt", p]
+    if motion_edit:
+        args += ["--motion_edit", "--keep_joints", keep_joints]
+    if inbetween:
+        args += ["--inbetween", "--keep_frames", keep_frames]
+    if motion_expand:
+        args += ["--motion_expand", "--expand_overlap", str(int(expand_overlap))]
     if cfg_scale is not None:
         args += ["--cfg_scale", str(cfg_scale)]
     if seed is not None:
@@ -305,6 +341,33 @@ def download_checkpoint(
     for pat in (include or []):
         args += ["--include", pat]
     rc, so, se = _run(args, timeout=7200)
+    return json.dumps({"returncode": rc,
+                       "stdout_tail": so[-2000:],
+                       "stderr_tail": se[-2000:] if rc else ""},
+                      ensure_ascii=False, indent=2)
+
+
+@mcp.tool()
+def train(config: str = "configs/uniml3d_60frames_graph_adaln.json") -> str:
+    """(Advanced) Train UniMate on a prepared dataset via accelerate. Requires
+    the UniML3D clips under dataset/features/<dataset>/ - out of the
+    inference-only workflow."""
+    rc, so, se = _run([
+        "-m", "accelerate.commands.launch", "--num_processes", "1",
+        "-m", "unimate.training.train", "--config", config,
+    ], timeout=7200)
+    return json.dumps({"returncode": rc,
+                       "stdout_tail": so[-2000:],
+                       "stderr_tail": se[-2000:] if rc else ""},
+                      ensure_ascii=False, indent=2)
+
+
+@mcp.tool()
+def precompute_text_emb(config: str = "configs/uniml3d_60frames_graph_adaln.json") -> str:
+    """(Advanced) Precompute T5 caption/joint-name embeddings beside the
+    dataset features for a training config."""
+    rc, so, se = _run(["-m", "unimate.tools.precompute_text_emb", "--config", config],
+                      timeout=3600)
     return json.dumps({"returncode": rc,
                        "stdout_tail": so[-2000:],
                        "stderr_tail": se[-2000:] if rc else ""},

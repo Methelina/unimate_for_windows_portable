@@ -40,13 +40,21 @@ def main(argv=None) -> int:
     sub.add_parser("checkpoints", help="list usable checkpoints")
 
     p_sample = sub.add_parser("sample", help="text-to-animation sampling")
-    p_sample.add_argument("asset")
-    p_sample.add_argument("prompts", nargs="+")
+    p_sample.add_argument("asset", nargs="?", default=None)
+    p_sample.add_argument("prompts", nargs="*")
     p_sample.add_argument("--reps", type=int, default=1)
     p_sample.add_argument("--cfg", type=float, default=None)
     p_sample.add_argument("--seed", type=int, default=None)
     p_sample.add_argument("--exp", default=server.DEFAULT_EXP)
     p_sample.add_argument("--out", default=None)
+    p_sample.add_argument("--cases", default=None,
+                          help="test_cases_json (required for the modes below)")
+    p_sample.add_argument("--edit", action="store_true", help="motion editing mode")
+    p_sample.add_argument("--joints", default="Neck,Head")
+    p_sample.add_argument("--inbetween", action="store_true")
+    p_sample.add_argument("--frames", default="0,-1")
+    p_sample.add_argument("--expand", action="store_true")
+    p_sample.add_argument("--overlap", type=int, default=10)
 
     p_man = sub.add_parser("manifest", help="read a run's manifest.json")
     p_man.add_argument("output_dir")
@@ -85,10 +93,15 @@ def main(argv=None) -> int:
         print(server.list_checkpoints())
         return 0
     if args.cmd == "sample":
+        if not args.asset and not args.cases:
+            ap.error("sample needs an asset or --cases")
         print(server.sample_animation(
-            asset=args.asset, prompts=args.prompts, num_repetitions=args.reps,
-            cfg_scale=args.cfg, seed=args.seed, exp_dir=args.exp,
-            output_dir=args.out))
+            asset=args.asset or "", prompts=args.prompts or None,
+            num_repetitions=args.reps, cfg_scale=args.cfg, seed=args.seed,
+            exp_dir=args.exp, output_dir=args.out, test_cases_json=args.cases,
+            motion_edit=args.edit, keep_joints=args.joints,
+            inbetween=args.inbetween, keep_frames=args.frames,
+            motion_expand=args.expand, expand_overlap=args.overlap))
         return 0
     if args.cmd == "manifest":
         print(server.get_manifest(args.output_dir))
